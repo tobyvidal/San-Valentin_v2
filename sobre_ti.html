@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre Ti</title>
+    <link rel="stylesheet" href="Files css/styleSobreTi.css">
+</head>
+<body>
+    <nav>
+        <a onclick="navegar(1);">🏠</a>
+        <a onclick="navegar(2);">🛫</a>
+        <a onclick="navegar(3);">🎞️</a>
+        <a onclick="navegar(4);">👸</a>
+    </nav>
+
+    
+        <main>
+            <h2>¿Por qué vos?</h2>
+        
+            <div class="sobre-ti-section">
+                <img src="imagenes_sobreti/f1.jpeg" alt="Foto 1">
+                <div class="sobre-ti-texto">
+                    <p>Vos, porque te hablé por instagram sin esperar nada y simplemente con mensajes te adueñaste de mi corazón.</p>
+                </div>
+            </div>
+            
+            <div class="sobre-ti-section">
+                <img src="imagenes_sobreti/f2.jpeg" alt="Foto 2">
+                <div class="sobre-ti-texto">
+                    <p>Vos, porque sos aquella persona que me transmite paz y tranquilidad.</p>
+                </div>
+            </div>
+            
+            <div class="sobre-ti-section">
+                <img src="imagenes_sobreti/f3.jpeg" alt="Foto 3">
+                <div class="sobre-ti-texto">
+                    <p>Vos, porque me encanta lo familiera que sos, lo buena persona, todo.</p>
+                </div>
+            </div>
+            
+            <div class="sobre-ti-section">
+                <img src="imagenes_sobreti/f4.jpeg" alt="Foto 4">
+                <div class="sobre-ti-texto">
+                    <p>Vos, porque compartis mi mismo humor y me haces reir muchisimo.</p>
+                </div>
+            </div>
+            
+            <div class="sobre-ti-section">
+                <img src="imagenes_sobreti/f5.jpeg" alt="Foto 5">
+                <div class="sobre-ti-texto">
+                    <p>Vos, porque me enamoras cada día más.</p>
+                </div>
+            </div>
+            
+            <div class="sobre-ti-section">
+                <img src="imagenes_sobreti/f6.jpeg" alt="Foto 6">
+                <div class="sobre-ti-texto">
+                    <p>Vos, porque desde que me di vuelta y vi tu carita se me quedo tatuada en la memoria.</p>
+                </div>
+            </div>
+            
+            <div class="sobre-ti-section">
+                <img src="imagenes_sobreti/f7.jpeg" alt="Foto 7">
+                <div class="sobre-ti-texto">
+                    <p>Desde el primer momento que te conocí, supe que serías especial en mi vida. Tu sonrisa ilumina mis días.</p>
+                </div>
+            </div>
+            
+            <div class="sobre-ti-section">
+                <img src="imagenes_sobreti/f8.jpeg" alt="Foto 8">
+                <div class="sobre-ti-texto">
+                    <p>Vos, porque haces que horas sean segundos.</p>
+                </div>
+            </div>
+            
+            <div class="sobre-ti-section">
+                <img src="imagenes_sobreti/f10.jpeg" alt="Foto 10">
+                <div class="sobre-ti-texto">
+                    <p>Vos, porque desde que te conocí, tengo alguien a quien contarle mis problemas, alguien a quien contarle mis alegrias, alguien de quien quiero saber siempre, alguien que cada vez que sonrie me endulza el alma...</p>
+                    <p>Vos vos y vos, siempre que quieras lo vas a ser princesa.</p>
+                </div>
+            </div>
+            
+            
+        </main>
+  
+</body>
+<footer>
+    <a onclick="navegar(5);">Descubre tu otro 🎁!</a>
+</footer>
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const User_Id = Number(params.get("User_Id")); // Convertir a número
+    
+    function navegar(pestaña){
+        console.log(User_Id);
+        switch(pestaña){
+            case 1:
+                window.location.href = `home.html?User_Id=${User_Id}`;
+                break;
+            case 2:
+                window.location.href = `viajes.html?User_Id=${User_Id}`;
+                break;
+            case 3:
+                window.location.href = `momentos.html?User_Id=${User_Id}`;
+                break;
+            case 4:
+                window.location.href = `sobre_ti.html?User_Id=${User_Id}`;
+                break;
+            case 5:
+                window.location.href = `regaloPorAgno.html?User_Id=${User_Id}`;
+                break;
+        }
+    }
+</script>
+</html>

@@ -1,0 +1,235 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(to bottom, 
+    #87CEEB 0%,    /* Cielo azul claro */
+    #1E90FF 35%,   /* Azul más intenso del mar */
+    #4682B4 50%,   /* Transición de agua profunda */
+    #F4A460 80%,   /* Arena más oscura */
+    #FFDAB9 100%   /* Arena clara */
+);
+    height: 100vh;
+    margin: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: repeat;
+    font-family: Arial, sans-serif;
+    color: #FFFFFF;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    padding-top: 60px; /* Evita que el contenido quede oculto detrás del menú */
+
+}
+
+/* HEADER */
+header {
+    color: #FFFFFF;
+    padding: 20px;
+    font-size: 36px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* NAVBAR */
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    border-radius: 0;
+    z-index: 1000; /* Asegura que quede sobre otros elementos */
+}
+
+
+
+nav a {
+    text-decoration: none;
+    color: white;
+    font-size: 22px;
+    margin: 0 15px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    border-radius: 5px;
+}
+
+nav a:hover {
+    background-color: #FFA07A;
+    transform: scale(1.1);
+}
+
+/* DROPDOWN MENU */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: rgba(30, 144, 255, 0.9);
+    min-width: 160px;
+    border-radius: 5px;
+    z-index: 1;
+    margin-top: 10px;
+}
+
+.dropdown-content a {
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #FFA07A;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* MENSAJE CENTRAL */
+.mensaje {
+    max-width: 600px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #2F4F4F;
+    border-radius: 10px;
+    font-size: 20px;
+    margin: 30px auto 20px;
+    text-align: left;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* FOOTER */
+footer {
+    margin-top: auto;
+    background-color: rgba(255, 215, 0, 0.8);
+    color: #2F4F4F;
+    padding: 10px;
+    font-size: 14px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* 📱 RESPONSIVE DESIGN 📱 */
+@media (max-width: 768px) {
+    /* Ajuste del fondo en móviles */
+    body {
+        background-size: contain;
+    }
+
+    /* Reducimos el tamaño del header */
+    header {
+        font-size: 28px;
+        padding: 15px;
+    }
+
+    /* Menú de navegación más compacto */
+    nav {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      
+    }
+
+    nav a {
+        font-size: 18px;
+        padding: 8px;
+        width: 80%;
+        text-align: center;
+    }
+
+    /* Ajustamos la lista de viajes */
+    .viajes-lista {
+        width: 100%;
+    }
+
+    /* Reducimos el tamaño del mensaje */
+    .mensaje {
+        font-size: 18px;
+        padding: 15px;
+        max-width: 90%;
+    }
+
+    /* Footer más legible */
+    footer {
+        font-size: 12px;
+        padding: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Ajustes en móviles pequeños */
+    header {
+        font-size: 24px;
+        padding: 10px;
+    }
+
+    nav a {
+        font-size: 16px;
+        width: 90%;
+    }
+
+    .mensaje {
+        font-size: 16px;
+    }
+}
+/* Sección de imágenes y texto alternado */
+.sobre-ti-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 40px auto;
+    width: 80%;
+    max-width: 1000px;
+}
+
+/* Alternancia entre imagen izquierda y derecha */
+.sobre-ti-section:nth-child(even) {
+    flex-direction: row-reverse;
+}
+
+.sobre-ti-section img {
+    width: 45%;
+    max-width: 400px;
+    height: auto;
+    border-radius: 15px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.sobre-ti-texto {
+    width: 50%;
+    padding: 20px;
+    text-align: justify;
+    font-size: 18px;
+    background: rgb(18 2 2 / 58%);
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsividad para móviles */
+@media (max-width: 768px) {
+    .sobre-ti-section {
+        flex-direction: column !important;
+        text-align: center;
+    }
+
+    .sobre-ti-texto {
+        width: 90%;
+    }
+
+    .sobre-ti-section img {
+        width: 80%;
+    }
+}
+

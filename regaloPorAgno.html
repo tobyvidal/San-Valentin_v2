@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Files css/styleRegaloAgno.css">       
+    <title>Carta Regalo</title>
+</head>
+<body>
+    <nav>
+        <a onclick="navegar(1);">🏠</a>
+        <a onclick="navegar(2);">🛫</a>
+        <a onclick="navegar(3);">🎞️</a>
+        <a onclick="navegar(4);">👸</a>
+    </nav>
+    <div class="carta">
+        <h1>🎁 Carta Regalo 🎁</h1>
+        <p>Te invito a <strong>Metropolitan Romareda</strong> a un masaje para 2 personas que incluye:</p>
+        <ul>
+            <li>Masaje craneofacial, cuello y escote (30 min)</li>
+            <li>Acceso al circuito spa de relajación (45 min)</li>
+        </ul>
+        <p>¡Disfrútalo mucho! 💖</p>
+    </div>
+</body>
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const User_Id = Number(params.get("User_Id")); // Convertir a número
+    
+    function navegar(pestaña){
+        console.log(User_Id);
+        switch(pestaña){
+            case 1:
+                window.location.href = `home.html?User_Id=${User_Id}`;
+                break;
+            case 2:
+                window.location.href = `viajes.html?User_Id=${User_Id}`;
+                break;
+            case 3:
+                window.location.href = `momentos.html?User_Id=${User_Id}`;
+                break;
+            case 4:
+                window.location.href = `sobre_ti.html?User_Id=${User_Id}`;
+                break;
+        }
+    }
+</script>
+</html>

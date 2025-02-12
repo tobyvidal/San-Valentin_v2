@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!--Link a la hoja de estilos.-->
+        <link rel="stylesheet" href="Files css/styleIndex.css">       
+        <title>Nuestra Historia</title>
+    </head>
+    <body>
+        <header>San Valentín ✨🌻</header>
+        <nav>
+            <a onclick="navegar(1);">🏠</a>
+            <a onclick="navegar(2);">🛫</a>
+            <a onclick="navegar(3);">🎞️</a>
+            <a onclick="navegar(4);">👸</a>
+        </nav>
+       
+        </button>
+                <div class="mensaje">
+            <p>Feliz San Valentín amor,</p>
+            <p>Se que es un poco friki de mi parte, pero esto que estás viendo es una página web que hice para nosotros,
+            donde vamos a poder inmortalizar miles de momentos, viajes y cosas lindas que vayamos haciendo.</p>
+            <p>Espero que te guste princesa, te amo ❤️.</p>
+        </div>
+
+    </body>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const User_Id = Number(params.get("User_Id")); // Convertir a número
+        
+        function navegar(pestaña){
+            console.log(User_Id);
+            switch(pestaña){
+                case 1:
+                    window.location.href = `home.html?User_Id=${User_Id}`;
+                    break;
+                case 2:
+                    window.location.href = `viajes.html?User_Id=${User_Id}`;
+                    break;
+                case 3:
+                    window.location.href = `momentos.html?User_Id=${User_Id}`;
+                    break;
+                case 4:
+                    window.location.href = `sobre_ti.html?User_Id=${User_Id}`;
+                    break;
+            }
+        }
+    </script>
+</html>
