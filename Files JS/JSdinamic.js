@@ -28,14 +28,14 @@ window.insertarImagenDeViaje = async (imagenFile, descrip) => {
     try {
         const imageUrl = await subirImagen(imagenFile); // Esperamos a que la imagen se suba
         console.log("Imagen:", imageUrl);
-        const maxIdQuery = query(imgCollection, orderBy("Img_Id", "desc"), limit(1));
+        const maxIdQuery = query(imgCollection, orderBy("Orden", "desc"), limit(1));
         const querySnapshot = await getDocs(maxIdQuery);
 
         let nuevoId = 1; // Por defecto, si no hay registros previos
         let nuevoOrden = 1;
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            nuevoId = data.Img_Id + 1; // Sumar 1 al máximo encontrado
+            nuevoId = data.Imagen_Id + 1; // Sumar 1 al máximo encontrado
             nuevoOrden = data.Orden + 1;
         });
 
@@ -135,76 +135,7 @@ formCrearViaje.addEventListener("submit", (e) => {
   formCrearViaje.reset();
 });
 
-
-// Función para mostrar las imágenes en el carrusel
-/*async function mostrarImagenes() {
-    console.log("Cargando imágenes...");
-
-    const carousel = document.getElementById("carousel");
-    const prevButton = document.querySelector(".prev");
-    const nextButton = document.querySelector(".next");
-
-    // Limpiar el carrusel antes de agregar nuevas imágenes
-    carousel.innerHTML = "";
-    descripcionViajeElement.textContent = "";
-
-    try {
-        const slide = document.createElement("div");
-        slide.classList.add("carousel-slide");
-        // Generar la consulta y obtener los documentos
-        const consulta = query(collection(db, "Imagenes_Viaje"), where("Viaje_Id", "==", idViaje));
-        const querySnapshot = await getDocs(consulta);
-
-        if (querySnapshot.empty) {
-            descripcionViajeElement.textContent = "El viaje no tiene imágenes, graba recuerdos!";
-            console.warn("No hay imágenes para este viaje.");
-            return;
-        }
-
-        let imageCount = 0;
-
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            console.log("Imagen encontrada:", data);
-
-            if (data.Img) {
-                const img = document.createElement("img");
-                img.src = data.Img;
-                img.alt = data.Descrip || "Imagen de viaje";
-                img.style.width = "100%";
-                slide.appendChild(img);
-                slide.setAttribute("data-descripcion", data.Descrip);
-                carousel.appendChild(slide);
-                imageCount++;
-            }
-        });
-
-        // Actualiza las imágenes en el carrusel
-        slides = document.querySelectorAll(".carousel-slide");
-
-        if (slides.length > 0) {
-            slideIndex = slides.length - 1; // Ir a la última imagen
-            updateCarousel();
-            actualizarImagenActiva();
-            
-            // Mostrar la descripción de la última imagen
-            descripcionViajeElement.textContent = slides[slideIndex].getAttribute("data-descripcion");
-        }
-
-        if (imageCount <= 1) {
-            prevButton.classList.add("hidden");
-            nextButton.classList.add("hidden");
-        } else {
-            prevButton.classList.remove("hidden");
-            nextButton.classList.remove("hidden");
-        }
-
-    } catch (error) {
-        console.error("Error al obtener imágenes:", error);
-    }
-}*/
-
-async function mostrarImagenes() {
+async function mostrarImagenes_1() {
     console.log("Cargando imágenes...");
 
     const carousel = document.getElementById("carousel");
@@ -271,6 +202,83 @@ async function mostrarImagenes() {
         console.error("Error al obtener imágenes:", error);
     }
 }
+
+async function mostrarImagenes() {
+    console.log("Cargando imágenes...");
+
+    const carousel = document.getElementById("carousel");
+    const prevButton = document.querySelector(".prev");
+    const nextButton = document.querySelector(".next");
+
+    // Limpiar el carrusel antes de agregar nuevas imágenes
+    carousel.innerHTML = "";
+    descripcionViajeElement.textContent = "";
+
+    try {
+        const consulta = query(
+            collection(db, "Imagenes_Viaje"),
+            where("Viaje_Id", "==", idViaje)
+        );
+
+        const querySnapshot = await getDocs(consulta);
+        
+        if (querySnapshot.empty) {
+            console.warn("No hay imágenes en la base de datos.");
+            descripcionViajeElement.textContent = "El viaje no tiene imágenes, graba recuerdos!";
+            return;
+        }
+
+        // 🔹 Ordenar manualmente por 'Orden'
+        const sortedDocs = querySnapshot.docs
+            .map(doc => doc.data())
+            .sort((a, b) => b.Orden - a.Orden);
+
+        let imageCount = 0;
+
+        sortedDocs.forEach((data) => {  // 🔥 Ahora usamos `sortedDocs`
+            console.log("Imagen encontrada:", data);
+
+            if (data.Img) {
+                const slide = document.createElement("div");
+                slide.classList.add("carousel-slide");
+
+                const img = document.createElement("img");
+                img.src = data.Img;
+                img.alt = data.Descrip || "Imagen de viaje";
+                img.style.width = "100%";
+                slide.appendChild(img);
+                slide.setAttribute("data-descripcion", data.Descrip);
+                carousel.appendChild(slide);
+                imageCount++;
+            }
+        });
+
+        // Actualiza las imágenes en el carrusel
+        slides = document.querySelectorAll(".carousel-slide");
+
+        if (slides.length > 0) {
+            slideIndex = slides.length - 1; // Ir a la última imagen
+            updateCarousel();
+            actualizarImagenActiva();
+            
+            // Mostrar la descripción de la última imagen
+            descripcionViajeElement.textContent = slides[slideIndex].getAttribute("data-descripcion");
+        }
+
+        if (imageCount <= 1) {
+            prevButton.classList.add("hidden");
+            nextButton.classList.add("hidden");
+        } else {
+            prevButton.classList.remove("hidden");
+            nextButton.classList.remove("hidden");
+        }
+
+    } catch (error) {
+        console.error("Error al obtener imágenes:", error);
+    }
+}
+
+
 
 
 
