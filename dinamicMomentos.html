@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuerdos</title>
+    <link rel="stylesheet" href="Files css/styleDinamic.css"> 
+    <script type="module" src="Files JS/imgbbAPIconfig.js"></script>
+    <script type="module" src="Files JS/DinamicMomentos.js"></script>      
+</head>
+    <body>
+        <nav>
+            <a onclick="navegar(1);">🏠</a>
+            <a onclick="navegar(2);">🛫</a>
+            <a onclick="navegar(3);">🎞️</a>
+            <a onclick="navegar(4);">👸</a>
+        </nav>
+        <main>
+            <!-- Sección para mostrar la descripción -->
+            <div class="viajes-section">
+                <div class="viajes-texto">
+                    <p id="descripcionViaje">Aún no tienes recuerdos en este momento, crea tu primer recuerdo!</p> 
+                </div>
+            </div>
+
+            <!-- Botones alineados a la izquierda, centro y derecha -->
+            <div class="feed">
+                <div class="carousel-container">
+                    <div class="carousel" id="carousel">
+                        <!-- Los slides se insertarán aquí dinámicamente con JavaScript -->
+                    </div>
+                    <button class="prev" onclick="moveSlide(1)">&#10094;</button>
+                    <button class="next" onclick="moveSlide(-1)">&#10095;</button>
+                </div>
+            </div>         
+            <button id="crearViajeBtn">Agregar recuerdo</button> <!-- Botón "+" -->   
+            <button id="borrarBtn" onclick="borrarImagen('Imagenes_Instantes')">Borrar recuerdo</button> <!-- Botón de borrar -->
+            
+
+            <!-- Formulario de creación de viaje -->
+            <div id="crearViajeModal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <span id="cerrarModal" class="close">&times;</span>
+                    <h3>Subir recuerdo</h3>
+                    <form id="formCrearViaje">
+                        <label for="descrip">Descripción:</label>
+                        <input type="text" id="descrip" name="descrip" required><br><br>
+
+                        <label for="imagen">URL de la imagen:</label>
+                        <input type="file" id="fileInput" accept="image/*" />
+
+                        <button type="submit">Guardar</button>
+                    </form>
+                </div>
+            </div>
+
+        </main>
+    </body>
+</html>
