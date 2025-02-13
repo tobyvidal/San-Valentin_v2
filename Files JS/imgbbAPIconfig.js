@@ -1,4 +1,4 @@
-const apiKey = "7179451d8d261a8f7c1e02e8f0c6fa75"; // Reemplaza con tu API Key de ImgBB
+const apiKey = ""; 
 
 // Función para subir imagen a ImgBB
 function subirImagen(archivo) {
