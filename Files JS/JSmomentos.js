@@ -165,7 +165,7 @@ async function mostrarImagenes() {
                 // Evento onclick para redirigir a dinamicViajes.html con parámetros en la URL
                 img.onclick = () => {
                     //window.location.href = `dinamincViajes.html?img=${encodeURIComponent(data.Img)}&desc=${encodeURIComponent(data.Descrip)}&IdViaje=${encodeURIComponent(data.Imagen_Id)}`;
-                    window.location.href = `dinamincViajes.html?img=${encodeURIComponent(data.Img)}&desc=${encodeURIComponent(data.Descrip)}&IdViaje=${encodeURIComponent(data.Imagen_Id)}&User_Id=${encodeURIComponent(User_Id)}`;
+                    window.location.href = `dinamicMomentos.html?img=${encodeURIComponent(data.Img)}&desc=${encodeURIComponent(data.Descrip)}&IdImagen=${encodeURIComponent(data.IdInstante)}&User_Id=${encodeURIComponent(User_Id)}`;
 
                 };
                 slide.setAttribute("data-descripcion", data.Descrip);
