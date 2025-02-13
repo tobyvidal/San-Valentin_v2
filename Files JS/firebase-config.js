@@ -6,7 +6,7 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.3.0/firebase
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+/*const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY, 
   authDomain: process.env.AUTHDOMAINV,
   projectId: process.env.PROJECTID,
@@ -14,6 +14,15 @@ const firebaseConfig = {
   messagingSenderId: process.env.MESSAGINGSENDERIDV,
   appId: process.env.APPID,
   measurementId: process.env.MEASUREMENTID
+};*/
+const firebaseConfig = {
+apiKey: "AIzaSyBi73dFNhY9nEXaWgcCdr2oUEJHJjUugqQ",
+authDomain: "sanvalentin-725b7.firebaseapp.com",
+projectId: "sanvalentin-725b7",
+storageBucket: "sanvalentin-725b7.appspot.com",
+messagingSenderId: "348954363146",
+appId: "1:348954363146:web:c6f95c30559818c1a466f3",
+measurementId: "G-S0VZPECLMF"
 };
 
 
