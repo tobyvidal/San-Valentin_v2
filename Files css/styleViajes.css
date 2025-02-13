@@ -317,7 +317,7 @@ nav a:hover {
 
 .carousel-slide img {
     max-width: 100%;
-    max-height: 300px;
+    max-height: 450px;
     width: auto;
     height: auto;
     object-fit: cover;
