@@ -1,4 +1,4 @@
-const apiKey = "process.env.APIKEYIMGBB"; 
+const apiKey = process.env.APIKEYIMGBB; 
 
 // Función para subir imagen a ImgBB
 function subirImagen(archivo) {
