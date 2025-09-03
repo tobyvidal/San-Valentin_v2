@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestra Historia</title>
+    <link rel="stylesheet" href="Files css/app.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Loading screen -->
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Cargando nuestra historia...</div>
+        </div>
+
+        <!-- Navigation -->
+        <nav id="main-nav" style="display: none;">
+            <a href="#home" data-section="home">🏠</a>
+            <a href="#viajes" data-section="viajes">🛫</a>
+            <a href="#momentos" data-section="momentos">🎞️</a>
+            <a href="#sobre-ti" data-section="sobre-ti">👸</a>
+        </nav>
+
+        <!-- Main content container -->
+        <main id="main-content" style="display: none;">
+            <!-- Content will be loaded here dynamically -->
+        </main>
+
+        <!-- Floating Action Buttons -->
+        <div id="floating-actions" class="floating-actions" style="display: none;">
+            <button id="add-viaje-btn" class="fab fab-viaje" title="Añadir Viaje">
+                ✈️
+                <span class="fab-label">Añadir Viaje</span>
+            </button>
+            <button id="add-momento-btn" class="fab fab-momento" title="Añadir Momento">
+                📸
+                <span class="fab-label">Añadir Momento</span>
+            </button>
+        </div>
+
+        <!-- Footer con contador de Navidad -->
+        <div id="christmas-footer" class="christmas-footer" style="display: none;">
+            <div class="countdown-title">🎄 Tiempo restante para descubrir regalo de Navidad 🎁</div>
+            <div class="countdown-container">
+                <div class="countdown-item">
+                    <span class="countdown-number" id="months">00</span>
+                    <span class="countdown-label">Meses</span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="days">00</span>
+                    <span class="countdown-label">Días</span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="hours">00</span>
+                    <span class="countdown-label">Horas</span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="minutes">00</span>
+                    <span class="countdown-label">Minutos</span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="seconds">00</span>
+                    <span class="countdown-label">Segundos</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="Files JS/app.js"></script>
+</body>
+</html>
