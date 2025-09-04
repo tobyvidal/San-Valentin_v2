@@ -64,6 +64,14 @@
                     <span class="countdown-label">Segundos</span>
                 </div>
             </div>
+            
+            <!-- Botón para activar notificaciones -->
+            <div class="notifications-toggle" style="margin-top: 15px;">
+                <button id="enable-notifications" class="notification-btn" onclick="spa.requestNotificationPermission()">
+                    🔔 Activar Notificaciones
+                </button>
+                <small id="notification-status" class="notification-status"></small>
+            </div>
         </div>
     </div>
 
