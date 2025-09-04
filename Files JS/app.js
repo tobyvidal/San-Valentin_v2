@@ -1,5 +1,5 @@
 // Imports de Firebase
-import { getFirestore, collection, query, orderBy, limit, getDocs, addDoc, where, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-firestore.js";
+import { getFirestore, collection, query, orderBy, limit, getDocs, addDoc, where, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-firestore.js";
 import { initializeFirebase } from "./firebase-config.js";
 import { subirImagen } from './imgbbAPIconfig.js';
 
@@ -15,6 +15,128 @@ class SPANavigator {
         this.countdownInterval = null;
         
         this.initFirebase();
+        this.initNotifications();
+    }
+
+    // Sistema de notificaciones del navegador
+    async initNotifications() {
+        console.log('Inicializando sistema de notificaciones...');
+        
+        // Verificar soporte de notificaciones
+        if (!("Notification" in window)) {
+            console.log("Este navegador no soporta notificaciones");
+            return;
+        }
+        
+        // Pedir permisos si no los tenemos
+        if (Notification.permission === "default") {
+            console.log('Solicitando permisos de notificación...');
+            const permission = await Notification.requestPermission();
+            console.log('Respuesta de permisos:', permission);
+        }
+        
+        console.log('Estado actual de permisos:', Notification.permission);
+        
+        // Actualizar estado del botón
+        this.updateNotificationButton();
+    }
+
+    // Actualizar estado del botón de notificaciones
+    updateNotificationButton() {
+        const button = document.getElementById('enable-notifications');
+        const status = document.getElementById('notification-status');
+        
+        if (!button || !status) return;
+        
+        if (!("Notification" in window)) {
+            button.textContent = '❌ No soportado';
+            button.disabled = true;
+            status.textContent = 'Tu navegador no soporta notificaciones';
+            return;
+        }
+        
+        switch(Notification.permission) {
+            case 'granted':
+                button.textContent = '✅ Notificaciones Activas';
+                button.disabled = true;
+                status.textContent = 'Las notificaciones están activadas';
+                break;
+            case 'denied':
+                button.textContent = '🔕 Denegadas';
+                button.disabled = true;
+                status.textContent = 'Notificaciones bloqueadas - revisar configuración del navegador';
+                break;
+            case 'default':
+                button.textContent = '🔔 Activar Notificaciones';
+                button.disabled = false;
+                status.textContent = 'Toca para activar notificaciones de la app';
+                break;
+        }
+    }
+
+    // Función pública para solicitar permisos
+    async requestNotificationPermission() {
+        if (!("Notification" in window)) {
+            alert("Tu navegador no soporta notificaciones push");
+            return;
+        }
+        
+        try {
+            const permission = await Notification.requestPermission();
+            console.log('Nuevo estado de permisos:', permission);
+            
+            // Actualizar botón
+            this.updateNotificationButton();
+            
+            if (permission === 'granted') {
+                // Enviar notificación de prueba
+                this.sendNotification(
+                    '🎉 ¡Notificaciones Activadas!',
+                    'Ahora recibirás notificaciones cuando tu pareja agregue contenido nuevo',
+                    '🔔',
+                    'test-notification'
+                );
+                this.showNotification('🔔 Notificaciones activadas correctamente', 'success');
+            } else if (permission === 'denied') {
+                this.showNotification('🔕 Notificaciones denegadas. Puedes activarlas desde la configuración del navegador.', 'error');
+            }
+        } catch (error) {
+            console.error('Error solicitando permisos:', error);
+            this.showNotification('❌ Error solicitando permisos de notificación', 'error');
+        }
+    }
+
+    // Enviar notificación push
+    sendNotification(title, body, icon = '💕', tag = 'san-valentin') {
+        // Solo enviar si tenemos permisos y no es el mismo usuario que hizo la acción
+        if (Notification.permission === "granted") {
+            try {
+                const notification = new Notification(title, {
+                    body: body,
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">' + icon + '</text></svg>',
+                    tag: tag,
+                    badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💕</text></svg>',
+                    requireInteraction: true,
+                    silent: false
+                });
+                
+                // Auto-cerrar después de 5 segundos
+                setTimeout(() => {
+                    notification.close();
+                }, 5000);
+                
+                console.log('Notificación enviada:', title);
+            } catch (error) {
+                console.error('Error enviando notificación:', error);
+            }
+        } else {
+            console.log('Sin permisos de notificación o denegados');
+        }
+    }
+
+    // Obtener nombre del usuario para notificaciones
+    getNotificationUserName(userId) {
+        return userId === 1 ? "Raquel" : userId === 2 ? "Tobi" : `Usuario ${userId}`;
     }
 
     initFirebase() {
@@ -45,6 +167,11 @@ class SPANavigator {
         console.log('Contenido cargado');
         await this.hideLoadingScreen();
         console.log('Loading screen ocultado');
+        
+        // Actualizar botón de notificaciones
+        setTimeout(() => {
+            this.updateNotificationButton();
+        }, 1000);
         
         // Detectar sección desde la URL (hash)
         const initialSection = this.getSectionFromURL();
@@ -509,9 +636,9 @@ class SPANavigator {
                 return;
             }
 
-            // Obtener viajes desde Firebase
+            // Obtener viajes desde Firebase (sin filtro de usuario - contenido compartido)
             const viajesCollection = collection(this.db, "Viajes");
-            const q = query(viajesCollection, where("IdUser", "==", this.currentUser));
+            const q = query(viajesCollection, orderBy("Imagen_Id", "desc"));
             const querySnapshot = await getDocs(q);
 
             let viajesHTML = '';
@@ -590,9 +717,9 @@ class SPANavigator {
                 </div>
             `;
 
-            // Obtener momentos desde Firebase
+            // Obtener momentos desde Firebase (sin filtro de usuario - contenido compartido)
             const momentosCollection = collection(this.db, "Instantes");
-            const q = query(momentosCollection, where("IdUser", "==", this.currentUser));
+            const q = query(momentosCollection, orderBy("IdInstante", "desc"));
             const querySnapshot = await getDocs(q);
 
             let momentosHTML = '';
@@ -808,16 +935,18 @@ class SPANavigator {
             const carousel = document.getElementById('detail-carousel');
             carousel.innerHTML = '<div class="loading-spinner"></div>';
 
-            let queryField, imageCollection;
+            let queryField, imageCollection, itemType;
             
             if (collectionName === 'viajes') {
                 // Para viajes, buscar en Imagenes_Viaje por Viaje_Id
                 imageCollection = collection(this.db, "Imagenes_Viaje");
                 queryField = "Viaje_Id";
+                itemType = "viaje";
             } else {
                 // Para momentos, buscar en Imagenes_Instantes por Imagen_Id
                 imageCollection = collection(this.db, "Imagenes_Instantes");
                 queryField = "Imagen_Id";
+                itemType = "momento";
             }
 
             const q = query(imageCollection, where(queryField, "==", Number(itemId)));
@@ -845,6 +974,11 @@ class SPANavigator {
                         imagesHTML += `
                             <div class="carousel-slide" data-img-url="${data.Img}" data-description="${data.Descrip || 'Sin descripción'}">
                                 <img src="${data.Img}" alt="${data.Descrip || 'Imagen'}" loading="lazy">
+                                <div class="image-overlay">
+                                    <button class="comment-btn" onclick="spa.showCommentsModal('${data.id || data.Imagen_Id}', 'imagen', '${itemType}')" title="Ver comentarios">
+                                        💬
+                                    </button>
+                                </div>
                             </div>
                         `;
                         imageCount++;
@@ -1142,6 +1276,16 @@ class SPANavigator {
             await addDoc(collection(this.db, collectionName), nuevoDoc);
             console.log('Imagen agregada exitosamente a Firebase');
             
+            // Enviar notificación push
+            const userName = this.getNotificationUserName(this.currentUser);
+            const itemTypeName = itemType === 'viaje' ? 'viaje' : 'momento';
+            this.sendNotification(
+                `📷 Nueva imagen agregada por ${userName}`,
+                `Se agregó una imagen al ${itemTypeName}`,
+                '📷',
+                'new-image'
+            );
+            
             // Restaurar botón antes de cerrar
             if (submitBtn) {
                 submitBtn.textContent = originalText;
@@ -1371,6 +1515,18 @@ class SPANavigator {
             // Mostrar notificación de éxito
             this.showNotification(`✅ ${uploadedFiles} imágenes agregadas exitosamente al ${itemType}!`, 'success');
             
+            // Enviar notificación push para carga múltiple
+            if (uploadedFiles > 0) {
+                const userName = this.getNotificationUserName(this.currentUser);
+                const itemTypeName = itemType === 'viaje' ? 'viaje' : 'momento';
+                this.sendNotification(
+                    `📷 ${uploadedFiles} imágenes agregadas por ${userName}`,
+                    `Se agregaron ${uploadedFiles} imágenes al ${itemTypeName}`,
+                    '📷',
+                    'bulk-upload'
+                );
+            }
+            
             // Recargar las imágenes del detail modal inmediatamente
             setTimeout(async () => {
                 console.log('Recargando imágenes del modal...');
@@ -1389,6 +1545,247 @@ class SPANavigator {
             submitBtn.textContent = '🚀 Subir Todas';
             submitBtn.disabled = false;
             progressContainer.style.display = 'none';
+        }
+    }
+
+    // Función para mostrar modal de comentarios
+    async showCommentsModal(itemId, commentType, parentType) {
+        console.log('Abriendo modal de comentarios:', itemId, commentType, parentType);
+        
+        // Cerrar modal existente si hay uno
+        const existingModal = document.getElementById('comments-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        const modalHTML = `
+            <div id="comments-modal" class="modern-modal show" onclick="this.remove()">
+                <div class="modern-modal-content" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h2>💬 Comentarios de la Imagen</h2>
+                        <button class="close-modal" onclick="document.getElementById('comments-modal').remove()">×</button>
+                    </div>
+                    
+                    <div class="comments-container">
+                        <div id="comments-list" class="comments-list">
+                            <div class="loading-comments">Cargando comentarios... ⏳</div>
+                        </div>
+                        
+                        <div class="comment-form">
+                            <textarea 
+                                id="new-comment-text" 
+                                placeholder="¿Qué opinas de esta imagen? Escribe tu comentario aquí..." 
+                                rows="3"
+                                maxlength="500"
+                            ></textarea>
+                            <div class="comment-form-actions">
+                                <span class="char-counter">0/500</span>
+                                <button 
+                                    id="submit-comment-btn" 
+                                    class="modern-btn primary" 
+                                    onclick="spa.submitComment('${itemId}', '${commentType}', '${parentType}')"
+                                >
+                                    💬 Agregar Comentario
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Agregar modal al DOM
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        
+        // Verificar que se insertó correctamente y forzar visibilidad
+        setTimeout(() => {
+            const modal = document.getElementById('comments-modal');
+            console.log('Modal de comentarios insertado:', modal);
+            
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.style.opacity = '1';
+                modal.style.visibility = 'visible';
+                console.log('Modal forzado a visible');
+            }
+        }, 10);
+        
+        // Configurar contador de caracteres
+        const textarea = document.getElementById('new-comment-text');
+        const charCounter = document.querySelector('.char-counter');
+        
+        if (textarea && charCounter) {
+            textarea.addEventListener('input', (e) => {
+                const length = e.target.value.length;
+                charCounter.textContent = `${length}/500`;
+                charCounter.style.color = length > 450 ? '#ff4757' : '#2f3542';
+            });
+        }
+        
+        // Cargar comentarios existentes
+        await this.loadComments(itemId, commentType, parentType);
+    }
+
+    // Función para obtener el nombre del usuario
+    getUserName(userId) {
+        const userNames = {
+            1: "Raquel",
+            2: "Tobi"
+        };
+        return userNames[userId] || `Usuario ${userId}`;
+    }
+
+    // Función para cargar comentarios (solo para imágenes específicas)
+    async loadComments(itemId, commentType, parentType) {
+        console.log('Cargando comentarios para imagen:', itemId, commentType, parentType);
+        
+        try {
+            // Consulta simplificada para comentarios de imágenes específicas
+            const commentsQuery = query(
+                collection(this.db, "Comentarios"),
+                where("Item_Id", "==", itemId),
+                where("Tipo_Comentario", "==", "imagen")
+            );
+            
+            const querySnapshot = await getDocs(commentsQuery);
+            const commentsList = document.getElementById('comments-list');
+            
+            // Ordenar por fecha (más recientes primero)
+            const sortedComments = [];
+            querySnapshot.forEach((doc) => {
+                sortedComments.push({
+                    id: doc.id,
+                    data: doc.data()
+                });
+            });
+            
+            sortedComments.sort((a, b) => {
+                const dateA = a.data.Fecha_Creacion ? a.data.Fecha_Creacion.toDate() : new Date(0);
+                const dateB = b.data.Fecha_Creacion ? b.data.Fecha_Creacion.toDate() : new Date(0);
+                return dateB.getTime() - dateA.getTime();
+            });
+            
+            if (sortedComments.length === 0) {
+                commentsList.innerHTML = `
+                    <div class="no-comments">
+                        <p>💭 No hay comentarios en esta imagen aún. ¡Sé la primera en comentar!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let commentsHTML = '';
+            sortedComments.forEach((commentDoc) => {
+                const comment = commentDoc.data;
+                const fecha = comment.Fecha_Creacion ? 
+                    comment.Fecha_Creacion.toDate().toLocaleString('es-ES', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) : 'Fecha no disponible';
+                
+                const userName = this.getUserName(comment.User_Id || 1);
+                
+                commentsHTML += `
+                    <div class="comment-item" data-comment-id="${commentDoc.id}">
+                        <div class="comment-header">
+                            <span class="comment-user">� ${userName}</span>
+                            <span class="comment-date">${fecha}</span>
+                            <button class="delete-comment-btn" onclick="spa.deleteComment('${commentDoc.id}', '${itemId}', '${commentType}', '${parentType}')" title="Eliminar comentario">
+                                🗑️
+                            </button>
+                        </div>
+                        <div class="comment-text">${comment.Texto}</div>
+                    </div>
+                `;
+            });
+            
+            commentsList.innerHTML = commentsHTML;
+            
+        } catch (error) {
+            console.error('Error cargando comentarios:', error);
+            document.getElementById('comments-list').innerHTML = `
+                <div class="error-message">
+                    ❌ Error cargando comentarios: ${error.message}
+                </div>
+            `;
+        }
+    }
+
+    // Función para enviar comentario
+    async submitComment(itemId, commentType, parentType) {
+        console.log('Enviando comentario:', itemId, commentType, parentType);
+        
+        const textarea = document.getElementById('new-comment-text');
+        const submitBtn = document.getElementById('submit-comment-btn');
+        const commentText = textarea.value.trim();
+        
+        if (!commentText) {
+            alert('Por favor escribe un comentario');
+            return;
+        }
+        
+        try {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enviando... ⏳';
+            
+            // Crear documento del comentario
+            const commentData = {
+                Item_Id: itemId,
+                Tipo_Comentario: commentType, // 'imagen'
+                Tipo_Padre: parentType, // 'viaje' o 'momento'
+                Texto: commentText,
+                User_Id: this.currentUser, // User_Id del usuario actual
+                Fecha_Creacion: serverTimestamp()
+            };
+            
+            // Guardar en Firebase
+            await addDoc(collection(this.db, "Comentarios"), commentData);
+            
+            // Enviar notificación push
+            const userName = this.getNotificationUserName(this.currentUser);
+            this.sendNotification(
+                `💬 Nuevo comentario de ${userName}`,
+                `"${commentText.substring(0, 50)}${commentText.length > 50 ? '...' : ''}"`,
+                '💬',
+                'new-comment'
+            );
+            
+            // Limpiar formulario
+            textarea.value = '';
+            document.querySelector('.char-counter').textContent = '0/500';
+            
+            // Recargar comentarios
+            await this.loadComments(itemId, commentType, parentType);
+            
+            // Mostrar notificación de éxito
+            this.showNotification('💬 ¡Comentario agregado exitosamente!', 'success');
+            
+        } catch (error) {
+            console.error('Error enviando comentario:', error);
+            this.showNotification('❌ Error enviando comentario: ' + error.message, 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '💬 Agregar Comentario';
+        }
+    }
+
+    // Función para eliminar comentario
+    async deleteComment(commentId, itemId, commentType, parentType) {
+        console.log('Eliminando comentario:', commentId);
+        
+        const confirmacion = confirm('¿Estás segura de que quieres eliminar este comentario?');
+        if (!confirmacion) return;
+        
+        try {
+            await deleteDoc(doc(this.db, "Comentarios", commentId));
+            await this.loadComments(itemId, commentType, parentType);
+            this.showNotification('🗑️ Comentario eliminado', 'success');
+        } catch (error) {
+            console.error('Error eliminando comentario:', error);
+            this.showNotification('❌ Error eliminando comentario: ' + error.message, 'error');
         }
     }
 
@@ -1757,6 +2154,16 @@ class SPANavigator {
 
             await addDoc(viajesCollection, nuevoViaje);
             console.log("Viaje insertado con éxito:", nuevoViaje);
+            
+            // Enviar notificación push
+            const userName = this.getNotificationUserName(this.currentUser);
+            this.sendNotification(
+                `✈️ Nuevo viaje agregado por ${userName}`,
+                `${titulo} - ${descrip}`,
+                '✈️',
+                'new-viaje'
+            );
+            
         } catch (error) {
             console.error("Error al insertar viaje:", error);
             throw error;
@@ -1788,6 +2195,16 @@ class SPANavigator {
 
             await addDoc(momentosCollection, nuevoMomento);
             console.log("Momento insertado con éxito:", nuevoMomento);
+            
+            // Enviar notificación push
+            const userName = this.getNotificationUserName(this.currentUser);
+            this.sendNotification(
+                `💕 Nuevo momento agregado por ${userName}`,
+                `${descrip}`,
+                '💕',
+                'new-momento'
+            );
+            
         } catch (error) {
             console.error("Error al insertar momento:", error);
             throw error;
