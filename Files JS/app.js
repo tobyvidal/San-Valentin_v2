@@ -15,31 +15,9 @@ class SPANavigator {
         this.countdownInterval = null;
         
         this.initFirebase();
-        this.initNotifications();
     }
 
-    // Sistema de notificaciones del navegador
-    async initNotifications() {
-        console.log('Inicializando sistema de notificaciones...');
-        
-        // Verificar soporte de notificaciones
-        if (!("Notification" in window)) {
-            console.log("Este navegador no soporta notificaciones");
-            return;
-        }
-        
-        // Pedir permisos si no los tenemos
-        if (Notification.permission === "default") {
-            console.log('Solicitando permisos de notificación...');
-            const permission = await Notification.requestPermission();
-            console.log('Respuesta de permisos:', permission);
-        }
-        
-        console.log('Estado actual de permisos:', Notification.permission);
-        
-        // Actualizar estado del botón
-        this.updateNotificationButton();
-    }
+
 
     // Actualizar estado del botón de notificaciones
     updateNotificationButton() {
@@ -52,6 +30,7 @@ class SPANavigator {
             button.textContent = '❌ No soportado';
             button.disabled = true;
             status.textContent = 'Tu navegador no soporta notificaciones';
+            status.style.color = '#ff6b6b';
             return;
         }
         
@@ -60,18 +39,82 @@ class SPANavigator {
                 button.textContent = '✅ Notificaciones Activas';
                 button.disabled = true;
                 status.textContent = 'Las notificaciones están activadas';
+                status.style.color = '#2ed573';
                 break;
             case 'denied':
-                button.textContent = '🔕 Denegadas';
-                button.disabled = true;
-                status.textContent = 'Notificaciones bloqueadas - revisar configuración del navegador';
+                button.textContent = '� Desbloquear';
+                button.disabled = false;
+                button.onclick = () => this.showUnblockInstructions();
+                status.textContent = 'Notificaciones bloqueadas - toca para ver instrucciones';
+                status.style.color = '#ff6b6b';
                 break;
             case 'default':
                 button.textContent = '🔔 Activar Notificaciones';
                 button.disabled = false;
+                button.onclick = () => this.requestNotificationPermission();
                 status.textContent = 'Toca para activar notificaciones de la app';
+                status.style.color = '#ffa502';
                 break;
         }
+    }
+
+    // Mostrar instrucciones para desbloquear notificaciones
+    showUnblockInstructions() {
+        const modalHTML = `
+            <div id="unblock-modal" class="modern-modal show" onclick="this.remove()">
+                <div class="modern-modal-content" onclick="event.stopPropagation()" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h2>🔓 Desbloquear Notificaciones</h2>
+                        <button class="close-modal" onclick="document.getElementById('unblock-modal').remove()">×</button>
+                    </div>
+                    
+                    <div style="padding: 20px; line-height: 1.6;">
+                        <div style="background: rgba(255, 107, 107, 0.1); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                            <p><strong>📱 EN MÓVIL (Chrome/Safari):</strong></p>
+                            <ol style="margin: 10px 0 0 20px;">
+                                <li>Toca el ícono de <strong>"candado" 🔒</strong> o <strong>"información" ℹ️</strong> en la barra de direcciones</li>
+                                <li>Busca <strong>"Notificaciones"</strong> y cámbialo a <strong>"Permitir"</strong></li>
+                                <li>Recarga la página</li>
+                            </ol>
+                        </div>
+                        
+                        <div style="background: rgba(102, 126, 234, 0.1); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                            <p><strong>💻 EN ESCRITORIO (Chrome):</strong></p>
+                            <ol style="margin: 10px 0 0 20px;">
+                                <li>Clic en el ícono de <strong>candado 🔒</strong> en la barra de direcciones</li>
+                                <li>Cambia <strong>"Notificaciones"</strong> de <strong>"Bloquear"</strong> a <strong>"Permitir"</strong></li>
+                                <li>Recarga la página</li>
+                            </ol>
+                        </div>
+                        
+                        <div style="background: rgba(255, 165, 2, 0.1); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                            <p><strong>🦊 EN FIREFOX:</strong></p>
+                            <ol style="margin: 10px 0 0 20px;">
+                                <li>Clic en el <strong>escudo 🛡️</strong> o ícono de información</li>
+                                <li>Desbloquea las notificaciones</li>
+                                <li>Recarga la página</li>
+                            </ol>
+                        </div>
+                        
+                        <div style="background: rgba(46, 213, 115, 0.1); border-radius: 10px; padding: 15px;">
+                            <p><strong>⚡ DESPUÉS DE DESBLOQUEAR:</strong></p>
+                            <p>Recarga esta página y el botón cambiará a <strong>"🔔 Activar Notificaciones"</strong></p>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="modern-btn primary" onclick="window.location.reload()" style="margin-right: 10px;">
+                                🔄 Recargar Página
+                            </button>
+                            <button class="modern-btn secondary" onclick="document.getElementById('unblock-modal').remove()">
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
     }
 
     // Función pública para solicitar permisos
@@ -108,7 +151,9 @@ class SPANavigator {
 
     // Enviar notificación push
     sendNotification(title, body, icon = '💕', tag = 'san-valentin') {
-        // Solo enviar si tenemos permisos y no es el mismo usuario que hizo la acción
+        console.log('🔔 Intentando enviar notificación:', { title, body, permission: Notification.permission });
+        
+        // Solo enviar si tenemos permisos
         if (Notification.permission === "granted") {
             try {
                 const notification = new Notification(title, {
@@ -120,17 +165,32 @@ class SPANavigator {
                     silent: false
                 });
                 
-                // Auto-cerrar después de 5 segundos
+                // Auto-cerrar después de 8 segundos (más tiempo para verla)
                 setTimeout(() => {
                     notification.close();
-                }, 5000);
+                }, 8000);
                 
-                console.log('Notificación enviada:', title);
+                console.log('✅ Notificación enviada exitosamente:', title);
+                
+                // Mostrar también notificación interna como respaldo
+                this.showNotification(`🔔 ${title}: ${body}`, 'info');
+                
             } catch (error) {
-                console.error('Error enviando notificación:', error);
+                console.error('❌ Error enviando notificación:', error);
+                // Mostrar notificación interna como fallback
+                this.showNotification(`🔔 ${title}: ${body}`, 'info');
             }
         } else {
-            console.log('Sin permisos de notificación o denegados');
+            console.log('❌ Sin permisos de notificación:', Notification.permission);
+            // Mostrar notificación interna como fallback
+            this.showNotification(`🔔 ${title}: ${body}`, 'info');
+            
+            // Si están denegados, recordar al usuario cómo activarlas
+            if (Notification.permission === 'denied') {
+                setTimeout(() => {
+                    this.showNotification('🔓 Las notificaciones están bloqueadas. Toca el botón en el footer para ver cómo activarlas.', 'warning');
+                }, 2000);
+            }
         }
     }
 
@@ -167,11 +227,6 @@ class SPANavigator {
         console.log('Contenido cargado');
         await this.hideLoadingScreen();
         console.log('Loading screen ocultado');
-        
-        // Actualizar botón de notificaciones
-        setTimeout(() => {
-            this.updateNotificationButton();
-        }, 1000);
         
         // Detectar sección desde la URL (hash)
         const initialSection = this.getSectionFromURL();
@@ -1276,16 +1331,6 @@ class SPANavigator {
             await addDoc(collection(this.db, collectionName), nuevoDoc);
             console.log('Imagen agregada exitosamente a Firebase');
             
-            // Enviar notificación push
-            const userName = this.getNotificationUserName(this.currentUser);
-            const itemTypeName = itemType === 'viaje' ? 'viaje' : 'momento';
-            this.sendNotification(
-                `📷 Nueva imagen agregada por ${userName}`,
-                `Se agregó una imagen al ${itemTypeName}`,
-                '📷',
-                'new-image'
-            );
-            
             // Restaurar botón antes de cerrar
             if (submitBtn) {
                 submitBtn.textContent = originalText;
@@ -1515,18 +1560,6 @@ class SPANavigator {
             // Mostrar notificación de éxito
             this.showNotification(`✅ ${uploadedFiles} imágenes agregadas exitosamente al ${itemType}!`, 'success');
             
-            // Enviar notificación push para carga múltiple
-            if (uploadedFiles > 0) {
-                const userName = this.getNotificationUserName(this.currentUser);
-                const itemTypeName = itemType === 'viaje' ? 'viaje' : 'momento';
-                this.sendNotification(
-                    `📷 ${uploadedFiles} imágenes agregadas por ${userName}`,
-                    `Se agregaron ${uploadedFiles} imágenes al ${itemTypeName}`,
-                    '📷',
-                    'bulk-upload'
-                );
-            }
-            
             // Recargar las imágenes del detail modal inmediatamente
             setTimeout(async () => {
                 console.log('Recargando imágenes del modal...');
@@ -1743,15 +1776,6 @@ class SPANavigator {
             
             // Guardar en Firebase
             await addDoc(collection(this.db, "Comentarios"), commentData);
-            
-            // Enviar notificación push
-            const userName = this.getNotificationUserName(this.currentUser);
-            this.sendNotification(
-                `💬 Nuevo comentario de ${userName}`,
-                `"${commentText.substring(0, 50)}${commentText.length > 50 ? '...' : ''}"`,
-                '💬',
-                'new-comment'
-            );
             
             // Limpiar formulario
             textarea.value = '';
