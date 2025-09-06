@@ -4,7 +4,122 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nuestra Historia</title>
+    
+    <!-- Favicon general -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    
+    <!-- Iconos para móviles (iOS y Android) -->
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="site.webmanifest">
+    
+    <!-- Meta tags para PWA -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Nuestra Historia">
+    
     <link rel="stylesheet" href="Files css/app.css">
+    
+    <!-- Service Worker Registration -->
+    <script>
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker registrado exitosamente:', registration.scope);
+                        
+                        // Verificar actualizaciones
+                        registration.addEventListener('updatefound', () => {
+                            console.log('🔄 Nueva versión disponible');
+                        });
+                    })
+                    .catch(function(error) {
+                        console.error('❌ Error registrando Service Worker:', error);
+                    });
+                
+                // Detectar cuando la app se puede instalar
+                let deferredPrompt;
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    console.log('📱 App puede instalarse');
+                    e.preventDefault();
+                    deferredPrompt = e;
+                    
+                    // Mostrar botón de instalación personalizado después de un momento
+                    setTimeout(() => {
+                        showInstallButton(deferredPrompt);
+                    }, 3000);
+                });
+                
+                function showInstallButton(prompt) {
+                    if (document.getElementById('install-button')) return; // Ya existe
+                    
+                    const installButton = document.createElement('div');
+                    installButton.id = 'install-button';
+                    installButton.innerHTML = `
+                        <div style="
+                            position: fixed;
+                            bottom: 20px;
+                            right: 20px;
+                            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+                            color: white;
+                            padding: 12px 20px;
+                            border-radius: 25px;
+                            cursor: pointer;
+                            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+                            font-weight: bold;
+                            z-index: 1000;
+                            animation: pulse 2s infinite;
+                            font-size: 14px;
+                        ">
+                            📱 Instalar App
+                        </div>
+                        <style>
+                            @keyframes pulse {
+                                0% { transform: scale(1); }
+                                50% { transform: scale(1.05); }
+                                100% { transform: scale(1); }
+                            }
+                        </style>
+                    `;
+                    
+                    document.body.appendChild(installButton);
+                    
+                    installButton.addEventListener('click', async () => {
+                        if (prompt) {
+                            prompt.prompt();
+                            const { outcome } = await prompt.userChoice;
+                            console.log(`📱 Usuario ${outcome === 'accepted' ? 'instaló' : 'canceló'} la instalación`);
+                            installButton.remove();
+                            deferredPrompt = null;
+                        }
+                    });
+                    
+                    // Auto-ocultar después de 10 segundos
+                    setTimeout(() => {
+                        if (installButton.parentNode) {
+                            installButton.style.opacity = '0.5';
+                        }
+                    }, 10000);
+                }
+                
+                // Detectar cuando la app se instala
+                window.addEventListener('appinstalled', (evt) => {
+                    console.log('🎉 ¡App instalada exitosamente!');
+                    const installButton = document.getElementById('install-button');
+                    if (installButton) {
+                        installButton.remove();
+                    }
+                });
+            });
+        }
+    </script>
 </head>
 <body>
     <div id="app">
@@ -64,18 +179,85 @@
                     <span class="countdown-label">Segundos</span>
                 </div>
             </div>
-            
-            <!-- Botón para activar notificaciones -->
-            <div class="notifications-toggle" style="margin-top: 15px;">
-                <button id="enable-notifications" class="notification-btn" onclick="spa.requestNotificationPermission()">
-                    🔔 Activar Notificaciones
-                </button>
-                <small id="notification-status" class="notification-status"></small>
-            </div>
         </div>
     </div>
 
     <!-- Scripts -->
     <script type="module" src="Files JS/app.js"></script>
+    
+    <!-- PWA Installation Script -->
+    <script>
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then((registration) => {
+                        console.log('✅ SW registrado:', registration);
+                    })
+                    .catch((error) => {
+                        console.log('❌ SW falló:', error);
+                    });
+            });
+        }
+
+        // PWA Installation Prompt
+        let deferredPrompt;
+        const installButton = document.createElement('button');
+        installButton.textContent = '📱 Instalar App';
+        installButton.className = 'pwa-install-btn';
+        installButton.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            display: none;
+            transition: all 0.3s ease;
+        `;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installButton.style.display = 'block';
+            document.body.appendChild(installButton);
+        });
+
+        installButton.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`PWA install outcome: ${outcome}`);
+                deferredPrompt = null;
+                installButton.style.display = 'none';
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('✅ PWA instalada exitosamente!');
+            installButton.style.display = 'none';
+        });
+    </script>
+    
+    <script>
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker registrado:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.error('❌ Error registrando Service Worker:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
