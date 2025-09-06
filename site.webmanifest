@@ -1,7 +1,7 @@
 {
     "name": "Nuestra Historia - San Valentín",
     "short_name": "Nuestra Historia",
-    "description": "App de pareja para compartir viajes, momentos y comentarios",
+    "description": "App de pareja para compartir viajes, momentos y comentarios. Nuestra historia de amor en una sola aplicación.",
     "icons": [
         {
             "src": "favicon-16x16.png",
@@ -16,22 +16,31 @@
         {
             "src": "apple-touch-icon.png",
             "sizes": "180x180",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         },
         {
             "src": "android-chrome-192x192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         },
         {
             "src": "android-chrome-512x512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         }
     ],
     "start_url": "./app.html",
     "display": "standalone",
     "background_color": "#667eea",
     "theme_color": "#667eea",
-    "orientation": "portrait"
+    "orientation": "portrait-primary",
+    "scope": "./",
+    "lang": "es",
+    "categories": ["lifestyle", "photo"],
+    "screenshots": [],
+    "prefer_related_applications": false,
+    "display_override": ["window-controls-overlay", "standalone", "minimal-ui"]
 }
