@@ -44,71 +44,6 @@
                         console.error('❌ Error registrando Service Worker:', error);
                     });
                 
-                // Detectar cuando la app se puede instalar
-                let deferredPrompt;
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    console.log('📱 App puede instalarse');
-                    e.preventDefault();
-                    deferredPrompt = e;
-                    
-                    // Mostrar botón de instalación personalizado después de un momento
-                    setTimeout(() => {
-                        showInstallButton(deferredPrompt);
-                    }, 3000);
-                });
-                
-                function showInstallButton(prompt) {
-                    if (document.getElementById('install-button')) return; // Ya existe
-                    
-                    const installButton = document.createElement('div');
-                    installButton.id = 'install-button';
-                    installButton.innerHTML = `
-                        <div style="
-                            position: fixed;
-                            bottom: 20px;
-                            right: 20px;
-                            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
-                            color: white;
-                            padding: 12px 20px;
-                            border-radius: 25px;
-                            cursor: pointer;
-                            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-                            font-weight: bold;
-                            z-index: 1000;
-                            animation: pulse 2s infinite;
-                            font-size: 14px;
-                        ">
-                            📱 Instalar App
-                        </div>
-                        <style>
-                            @keyframes pulse {
-                                0% { transform: scale(1); }
-                                50% { transform: scale(1.05); }
-                                100% { transform: scale(1); }
-                            }
-                        </style>
-                    `;
-                    
-                    document.body.appendChild(installButton);
-                    
-                    installButton.addEventListener('click', async () => {
-                        if (prompt) {
-                            prompt.prompt();
-                            const { outcome } = await prompt.userChoice;
-                            console.log(`📱 Usuario ${outcome === 'accepted' ? 'instaló' : 'canceló'} la instalación`);
-                            installButton.remove();
-                            deferredPrompt = null;
-                        }
-                    });
-                    
-                    // Auto-ocultar después de 10 segundos
-                    setTimeout(() => {
-                        if (installButton.parentNode) {
-                            installButton.style.opacity = '0.5';
-                        }
-                    }, 10000);
-                }
-                
                 // Detectar cuando la app se instala
                 window.addEventListener('appinstalled', (evt) => {
                     console.log('🎉 ¡App instalada exitosamente!');
@@ -207,7 +142,7 @@
         installButton.className = 'pwa-install-btn';
         installButton.style.cssText = `
             position: fixed;
-            top: 20px;
+            bottom: 20px;
             right: 20px;
             z-index: 1000;
             background: linear-gradient(45deg, #667eea, #764ba2);
@@ -222,12 +157,30 @@
             transition: all 0.3s ease;
         `;
 
+        // Solo mostrar el botón en la sección home
+        function updateInstallButtonVisibility() {
+            const currentHash = window.location.hash;
+            if (currentHash === '#home' || currentHash === '' || currentHash === '#') {
+                if (deferredPrompt) {
+                    installButton.style.display = 'block';
+                }
+            } else {
+                installButton.style.display = 'none';
+            }
+        }
+
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            installButton.style.display = 'block';
+            updateInstallButtonVisibility();
             document.body.appendChild(installButton);
         });
+
+        // Escuchar cambios de hash para mostrar/ocultar el botón
+        window.addEventListener('hashchange', updateInstallButtonVisibility);
+        
+        // Verificar al cargar la página
+        window.addEventListener('load', updateInstallButtonVisibility);
 
         installButton.addEventListener('click', async () => {
             if (deferredPrompt) {
