@@ -709,9 +709,9 @@ class SPANavigator {
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     viajesHTML += `
-                        <div class="gallery-item" onclick="spa.openViajeDetail('${data.Imagen_Id}', '${data.Img}', '${data.Descrip}')">
+                        <div class="gallery-item" onclick="spa.openViajeDetail('` + data.Imagen_Id + `', '` + data.Img + `', '` + (data.Descrip || '') + `')">
                             <div class="item-actions">
-                                <button class="delete-item-btn" onclick="event.stopPropagation(); spa.deleteItemConfirm('${doc.id}', 'viaje', '${data.Destino || 'Viaje'}');" title="Eliminar viaje">🗑️</button>
+                                <button class="delete-item-btn" onclick="event.stopPropagation(); spa.deleteItemConfirm('` + doc.id + `', 'viaje', '` + (data.Destino || 'Viaje') + `');" title="Eliminar viaje">🗑️</button>
                             </div>
                             <div class="carousel-container">
                                 <div class="carousel">
@@ -790,9 +790,9 @@ class SPANavigator {
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     momentosHTML += `
-                        <div class="gallery-item" onclick="spa.openMomentoDetail('${data.IdInstante}', '${data.Img}', '${data.Descrip}')">
+                        <div class="gallery-item" onclick="spa.openMomentoDetail('` + data.IdInstante + `', '` + data.Img + `', '` + (data.Descrip || '') + `')">
                             <div class="item-actions">
-                                <button class="delete-item-btn" onclick="event.stopPropagation(); spa.deleteItemConfirm('${doc.id}', 'momento', 'Momento');" title="Eliminar momento">🗑️</button>
+                                <button class="delete-item-btn" onclick="event.stopPropagation(); spa.deleteItemConfirm('` + doc.id + `', 'momento', 'Momento');" title="Eliminar momento">🗑️</button>
                             </div>
                             <div class="carousel-container">
                                 <div class="carousel">
@@ -878,7 +878,7 @@ class SPANavigator {
                 sobretiHTML += `
                     <div class="sobreti-item">
                         <img src="imagenes_sobreti/${fileName}" alt="Foto ${index + 1}" 
-                             onclick="spa.openPhotoModal('imagenes_sobreti/${fileName}')" 
+                             onclick="spa.openPhotoModal(\`imagenes_sobreti/\${fileName}\`)" 
                              loading="lazy"
                              onerror="this.style.display='none'">
                         <div class="photo-description">
@@ -963,9 +963,9 @@ class SPANavigator {
                         <div class="detail-info">
                             <h3 id="detail-description">${data.descrip}</h3>
                             <div class="detail-actions">
-                                <button class="modern-btn" onclick="spa.showAddImageToDetail('${data.id}', '${type}')">➕ Agregar Imagen</button>
-                                <button class="modern-btn primary" onclick="spa.showBulkUploadModal('${data.id}', '${type}')">📷 Subir Múltiples</button>
-                                <button class="modern-btn danger" onclick="spa.deleteCurrentDetailImage('${type}')">🗑️ Eliminar Imagen</button>
+                                <button class="modern-btn" onclick="spa.showAddImageToDetail('` + data.id + `', '` + type + `')">➕ Agregar Imagen</button>
+                                <button class="modern-btn primary" onclick="spa.showBulkUploadModal('` + data.id + `', '` + type + `')">📷 Subir Múltiples</button>
+                                <button class="modern-btn danger" onclick="spa.deleteCurrentDetailImage('` + type + `')">🗑️ Eliminar Imagen</button>
                             </div>
                         </div>
                     </div>
@@ -1030,7 +1030,7 @@ class SPANavigator {
                             <div class="carousel-slide" data-img-url="${data.Img}" data-description="${data.Descrip || 'Sin descripción'}">
                                 <img src="${data.Img}" alt="${data.Descrip || 'Imagen'}" loading="lazy">
                                 <div class="image-overlay">
-                                    <button class="comment-btn" onclick="spa.showCommentsModal('${data.id || data.Imagen_Id}', 'imagen', '${itemType}')" title="Ver comentarios">
+                                    <button class="comment-btn" onclick="spa.showCommentsModal('` + (data.id || data.Imagen_Id) + `', 'imagen', '` + itemType + `')" title="Ver comentarios">
                                         💬
                                     </button>
                                 </div>
@@ -1616,7 +1616,7 @@ class SPANavigator {
                                 <button 
                                     id="submit-comment-btn" 
                                     class="modern-btn primary" 
-                                    onclick="spa.submitComment('${itemId}', '${commentType}', '${parentType}')"
+                                    onclick="spa.submitComment('` + itemId + `', '` + commentType + `', '` + parentType + `')"
                                 >
                                     💬 Agregar Comentario
                                 </button>
@@ -1726,7 +1726,7 @@ class SPANavigator {
                         <div class="comment-header">
                             <span class="comment-user">� ${userName}</span>
                             <span class="comment-date">${fecha}</span>
-                            <button class="delete-comment-btn" onclick="spa.deleteComment('${commentDoc.id}', '${itemId}', '${commentType}', '${parentType}')" title="Eliminar comentario">
+                            <button class="delete-comment-btn" onclick="spa.deleteComment('` + commentDoc.id + `', '` + itemId + `', '` + commentType + `', '` + parentType + `')" title="Eliminar comentario">
                                 🗑️
                             </button>
                         </div>
